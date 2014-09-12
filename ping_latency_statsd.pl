@@ -3,11 +3,12 @@
 use strict;
 use Net::Ping;
 use IO::Socket;
+use Time::HiRes qw( usleep gettimeofday nanosleep clock_gettime);
 
 my $statsd_host   = "192.168.30.60";
 my $statsd_port   = 8125;
 my $ping_dest_ip  = "192.168.30.61";
-my $ping_interval = 1;
+my $ping_interval = 1000000;   #microseconds
 
 my $socket = IO::Socket::INET->new( PeerPort  => $statsd_port,
                                  PeerAddr  => $statsd_host,
@@ -35,7 +36,7 @@ while (1) {
   my $packet = $metric_name . sprintf (":%.2f|ms", $duration);
   # print "$packet\n";
   $socket->send($packet);
-  sleep($ping_interval);
+  usleep($ping_interval);
 }
 
 $p->close();
